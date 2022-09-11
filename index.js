@@ -39,8 +39,8 @@ export default async function (options) {
    open: (ws) => {
     console.log('A WebSocket connected with URL: ' + ws.url);
    },
-   message: Auth.message.bind(Auth, options.onMessage),
-   close: Auth.close.bind(Auth),
+   // message: Auth.message.bind(Auth, options.onMessage),
+   // close: Auth.close.bind(Auth),
   })
   .post('/upload', upload)
   .post('/util/*', (res, req) => post(res, req, options.postUtils))

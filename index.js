@@ -1,6 +1,5 @@
 import { MongoClient } from 'mongodb';
 import uWS from 'uWebSockets.js';
-import jwt from 'jsonwebtoken';
 // import post from './src/post.js';
 // import upload from './src/upload.js';
 // import get from './src/get.js';
@@ -15,7 +14,6 @@ import jwt from 'jsonwebtoken';
  * @param {function} getUtils(res, req) utilitati pe GET
  * @param {function} postUtils(res, req) utilitati pe GET
  * @param {function} getManifest(res, req) manifest pe GET
- * @param {string} jwtSecret secretul
  */
 export default async function (options) {
  const db = await new MongoClient(options.uri, { useNewUrlParser: true, useUnifiedTopology: true }).connect();
@@ -32,7 +30,7 @@ export default async function (options) {
    idleTimeout: 16, // 320  = 5 min
    upgrade: (res, req, context) => {
     try {
-     res.user = decodeJwtCookie(res, req, '__Secure-ID', options.jwtSecret);
+
     } catch {
      return res.writeStatus('401').end();
     }
@@ -59,4 +57,3 @@ const getCookie = (res, req, name) => {
  res.cookies ??= req.getHeader('cookie');
  return res.cookies && res.cookies.match((getCookie[name] ??= new RegExp(`(^|;)\\s*${name}\\s*=\\s*([^;]+)`)))?.[2];
 };
-const decodeJwtCookie = (res, req, name, jwtSecret) => jwt.verify(getCookie(res, req, name), jwtSecret);

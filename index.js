@@ -42,12 +42,12 @@ export default async function (options) {
    // message: Auth.message.bind(Auth, options.onMessage),
    // close: Auth.close.bind(Auth),
   })
-  .post('/upload', upload)
-  .post('/util/*', (res, req) => post(res, req, options.postUtils))
-  .get('/manifest.json', options.getManifest)
-  .get('/util/*', options.getUtils)
-  .post('/*', (res, req) => post(res, req, options.onPost))
-  .any('/*', get)
+  // .post('/upload', upload)
+  // .post('/util/*', (res, req) => post(res, req, options.postUtils))
+  // .get('/manifest.json', options.getManifest)
+  // .get('/util/*', options.getUtils)
+  // .post('/*', (res, req) => post(res, req, options.onPost))
+  // .any('/*', get)
   .listen(options.port || 443, (token) => {
    if (token) console.log('Listening to port ' + (options.port || 443));
    else console.log('Failed to listen to port ' + (options.port || 443));

@@ -68,7 +68,7 @@ const securityHeaders = [
   name: 'Content-Security-Policy',
   value: `
  default-src 'self';
- script-src 'self' ${global.HOST.contains('analitic') && 'unsafe-eval'} https://*.googleapis.com;
+ script-src 'self' ${global.HOST.includes('analitic') && 'unsafe-eval'} https://*.googleapis.com;
  connect-src 'self' wss: https://*.googleapis.com https://*.ytimg.com;
  img-src * 'self' data: blob:;
  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;

@@ -2,7 +2,7 @@ import { MongoClient } from 'mongodb';
 import uWS from 'uWebSockets.js';
 // import post from './src/post.js';
 // import upload from './src/upload.js';
-// import get from './src/get.js';
+import get from './get.js';
 // import { Auth } from './src/auth.js';
 /**
  *
@@ -30,7 +30,7 @@ export default async function (options) {
    idleTimeout: 16, // 320  = 5 min
    upgrade: (res, req, context) => {
     try {
-
+     // daca e logat
     } catch {
      return res.writeStatus('401').end();
     }
@@ -47,7 +47,7 @@ export default async function (options) {
   // .get('/manifest.json', options.getManifest)
   // .get('/util/*', options.getUtils)
   // .post('/*', (res, req) => post(res, req, options.onPost))
-  // .any('/*', get)
+   .any('/*', get)
   .listen(options.port || 443, (token) => {
    if (token) console.log('Listening to port ' + (options.port || 443));
    else console.log('Failed to listen to port ' + (options.port || 443));

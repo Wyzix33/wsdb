@@ -1,6 +1,7 @@
 import { readFile } from 'fs/promises';
 import zlib from 'zlib';
-
+import path from 'path';
+global.HOST = 'analitic.go.ro:9999';
 function ct(path) {
  const extension = path.split('.').pop().toLowerCase();
  let contentType = '';
@@ -58,7 +59,6 @@ const securityHeaders = [
  { name: 'Strict-Transport-Security', value: 'max-age=5184000' },
  { name: 'X-Content-Type-Options', value: 'nosniff' },
  { name: 'X-Frame-Options', value: 'DENY' },
- { name: 'X-Powered-By', value: 'G' },
  { name: 'Referrer-Policy', value: 'no-referrer' },
  { name: 'X-Download-Options', value: 'noopen' },
  { name: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
@@ -68,12 +68,12 @@ const securityHeaders = [
   name: 'Content-Security-Policy',
   value: `
  default-src 'self';
- script-src 'self' ${global.HOST.includes('analitic') && 'unsafe-eval'} https://*.googleapis.com;
- connect-src 'self' wss: https://*.googleapis.com https://*.ytimg.com;
+ script-src 'self' ${global.HOST.includes('analitic') ? "'unsafe-eval'" : ''};
+ connect-src 'self' wss:;
  img-src * 'self' data: blob:;
- style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
- font-src 'self' https://fonts.gstatic.com data:;
- frame-src 'self' https://www.youtube.com/;
+ style-src 'self' 'unsafe-inline';
+ font-src 'self';
+ frame-src 'self';
  manifest-src 'self'`,
  },
 ];
@@ -92,10 +92,9 @@ export default async function (res, req) {
  });
  let readStream;
  let acceptEncoding = req.getHeader('accept-encoding');
- console.log(req.getUrl());
  const path = req.getUrl().slice(1) || 'index.html';
  const contentType = ct(path);
- const fileName = saferesolve('./', path);
+ const fileName = saferesolve('./frontEnd', path);
  try {
   const file = await readFile(fileName);
   readStream = toArrayBuffer(file);

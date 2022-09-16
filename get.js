@@ -1,9 +1,8 @@
 import { readFile } from 'fs/promises';
-import zlib from 'zlib';
 import path from 'path';
 global.HOST = 'analitic.go.ro:9999';
-function ct(path) {
- const extension = path.split('.').pop().toLowerCase();
+function ct(pathu) {
+ const extension = pathu.split('.').pop().toLowerCase();
  let contentType = '';
  switch (extension) {
   case 'js':
@@ -68,7 +67,7 @@ const securityHeaders = [
   name: 'Content-Security-Policy',
   value: `
  default-src 'self';
- script-src 'self' ${global.HOST.includes('analitic') ? "'unsafe-eval'" : ''};
+ script-src 'self' ${global.HOST.includes('analitic') ? '\'unsafe-eval\'' : ''};
  connect-src 'self' wss:;
  img-src * 'self' data: blob:;
  style-src 'self' 'unsafe-inline';
@@ -85,33 +84,23 @@ const noCache = [
  { name: 'Expires', value: 'no-cache' },
 ];
 const cache = [{ name: 'Cache-Control', value: 'public, max-age=31536000, immutable' }];
-
 export default async function (res, req) {
  res.onAborted(() => {
   res.aborted = true;
  });
  let readStream;
- let acceptEncoding = req.getHeader('accept-encoding');
- const path = req.getUrl().slice(1) || 'index.html';
- const contentType = ct(path);
- const fileName = saferesolve('./frontEnd', path);
+ const pathu = req.getUrl().slice(1) || 'index.html';
+ const contentType = ct(pathu);
+ const fileName = saferesolve('./frontEnd', pathu);
  try {
   const file = await readFile(fileName);
   readStream = toArrayBuffer(file);
   res.cork(() => {
    res.writeHeader('Content-Type', contentType);
+   if (['text/javascript', 'text/css', 'text/html', 'image/svg+xml'].includes(contentType)) res.writeHeader('Content-Encoding', 'br');
    for (let i = 0; i < securityHeaders.length; i += 1) res.writeHeader(securityHeaders[i].name, securityHeaders[i].value);
-   if (!acceptEncoding || contentType === 'image/jpg' || contentType === 'font/woff2' || contentType === 'image/png' || contentType === 'image/gif' || contentType === 'application/zip') {
-    acceptEncoding = '';
-    for (let i = 0; i < cache.length; i += 1) res.writeHeader(cache[i].name, cache[i].value);
-   } else for (let i = 0; i < noCache.length; i += 1) res.writeHeader(noCache[i].name, noCache[i].value);
-   if (/\bgzip\b/.test(acceptEncoding)) {
-    res.writeHeader('Content-Encoding', 'gzip');
-    readStream = zlib.gzipSync(readStream);
-   } else if (/\bdeflate\b/.test(acceptEncoding)) {
-    res.writeHeader('Content-Encoding', 'deflate');
-    readStream = zlib.deflateSync(readStream);
-   }
+   if (['image/jpg', 'font/woff2', 'image/png', 'image/gif', 'application/zip'].includes(contentType)) for (let i = 0; i < cache.length; i += 1) res.writeHeader(cache[i].name, cache[i].value);
+   else for (let i = 0; i < noCache.length; i += 1) res.writeHeader(noCache[i].name, noCache[i].value);
    if (!res.aborted) res.end(readStream);
   });
  } catch {

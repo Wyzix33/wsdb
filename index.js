@@ -34,7 +34,7 @@ export default async function (options) {
     } catch {
      return res.writeStatus('401').end();
     }
-    res.upgrade({ uid: res.user._id }, req.getHeader('sec-websocket-key'), req.getHeader('sec-websocket-protocol'), req.getHeader('sec-websocket-extensions'), context);
+    return res.upgrade({ uid: 1 }, req.getHeader('sec-websocket-key'), req.getHeader('sec-websocket-protocol'), req.getHeader('sec-websocket-extensions'), context);
    },
    open: (ws) => {
     console.log('A WebSocket connected with URL: ' + ws.url);
@@ -53,7 +53,3 @@ export default async function (options) {
    else console.log('Failed to listen to port ' + (options.port || 443));
   });
 }
-const getCookie = (res, req, name) => {
- res.cookies ??= req.getHeader('cookie');
- return res.cookies && res.cookies.match((getCookie[name] ??= new RegExp(`(^|;)\\s*${name}\\s*=\\s*([^;]+)`)))?.[2];
-};
